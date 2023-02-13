@@ -19,10 +19,10 @@
 
 #ifdef GZ_HEADERS
 #include <gz/sim/System.hh>
-#define GZ_SIM_NAMESPACE gz::sim::
+namespace sim = gz::sim;
 #else
 #include <ignition/gazebo/System.hh>
-#define GZ_SIM_NAMESPACE ignition::gazebo::
+namespace sim = ignition::gazebo;
 #endif
 
 namespace gz_ros2_control
@@ -31,10 +31,10 @@ namespace gz_ros2_control
 class GazeboSimROS2ControlPluginPrivate;
 
 class GazeboSimROS2ControlPlugin
-  : public GZ_SIM_NAMESPACE System,
-  public GZ_SIM_NAMESPACE ISystemConfigure,
-  public GZ_SIM_NAMESPACE ISystemPreUpdate,
-  public GZ_SIM_NAMESPACE ISystemPostUpdate
+  : public sim::System,
+  public sim::ISystemConfigure,
+  public sim::ISystemPreUpdate,
+  public sim::ISystemPostUpdate
 {
 public:
   /// \brief Constructor
@@ -45,19 +45,19 @@ public:
 
   // Documentation inherited
   void Configure(
-    const GZ_SIM_NAMESPACE Entity & _entity,
+    const sim::Entity & _entity,
     const std::shared_ptr<const sdf::Element> & _sdf,
-    GZ_SIM_NAMESPACE EntityComponentManager & _ecm,
-    GZ_SIM_NAMESPACE EventManager & _eventMgr) override;
+    sim::EntityComponentManager & _ecm,
+    sim::EventManager & _eventMgr) override;
 
   // Documentation inherited
   void PreUpdate(
-    const GZ_SIM_NAMESPACE UpdateInfo & _info,
-    GZ_SIM_NAMESPACE EntityComponentManager & _ecm) override;
+    const sim::UpdateInfo & _info,
+    sim::EntityComponentManager & _ecm) override;
 
   void PostUpdate(
-    const GZ_SIM_NAMESPACE UpdateInfo & _info,
-    const GZ_SIM_NAMESPACE EntityComponentManager & _ecm) override;
+    const sim::UpdateInfo & _info,
+    const sim::EntityComponentManager & _ecm) override;
 
 private:
   /// \brief Private data pointer.

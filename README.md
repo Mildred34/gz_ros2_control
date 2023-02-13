@@ -7,7 +7,7 @@ ROS2 Distro | Build Status | Package build |
 This is a ROS 2 package for integrating the `ros2_control` controller architecture with the [Ignition Gazebo](http://ignitionrobotics.org/) simulator.
 More information about `ros2_control` can be found here: https://control.ros.org/
 
-This package provides an Gazebo system plugin which instantiates a `ros2_control` controller manager and connects it to a Gazebo model.
+This package provides a Gazebo-Sim system plugin which instantiates a `ros2_control` controller manager and connects it to a Gazebo model.
 
 [![Build Status](https://github.com/ros-controls/gz_ros2_control/actions/workflows/ci.yaml/badge.svg?branch=galactic)](https://github.com/ros-controls/gz_ros2_control/actions/workflows/ci.yaml)
 
@@ -25,12 +25,11 @@ Rolling | Garden (not released) | [ros2](https://github.com/ros-controls/gz_ros2
 
 # Compile from source
 
-If you want compile this from source, you should choose the Gazebo version. The default one is `citadel`:
+If you want compile this from source, you should choose the Gazebo version. The default one is `garden`:
 
 ```bash
-export GZ_VERSION=citadel
-export GZ_VERSION=edifice
 export GZ_VERSION=fortress
+export GZ_VERSION=garden
 ```
 
 Then create a workspace, clone the repo and compile it:
@@ -129,7 +128,7 @@ include:
 
 ### Using mimic joints in simulation
 
-To use `mimic` joints in `ign_ros2_control` you should define its parameters to your URDF.
+To use `mimic` joints in `gz_ros2_control` you should define its parameters to your URDF.
 We should include:
 
 - `<mimic>` tag to the mimicked joint ([detailed manual(https://wiki.ros.org/urdf/XML/joint))
@@ -158,7 +157,7 @@ We should include:
 ```
 
 
-## Add the ign_ros2_control plugin
+## Add the gz_ros2_control plugin
 
 In addition to the `ros2_control` tags, a Gazebo plugin needs to be added to your URDF that
 actually parses the `ros2_control` tags and loads the appropriate hardware interfaces and
@@ -280,11 +279,11 @@ The following example shows parallel gripper with mimic joint:
 
 
 ```bash
-ros2 launch ign_ros2_control_demos gripper_mimic_joint_example.launch.py
+ros2 launch gz_ros2_control_demos gripper_mimic_joint_example.launch.py
 ```
 
 Send example commands:
 
 ```bash
-ros2 run ign_ros2_control_demos example_gripper
+ros2 run gz_ros2_control_demos example_gripper
 ```

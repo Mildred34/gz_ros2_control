@@ -84,7 +84,7 @@ struct jointData
   double joint_effort_cmd;
 
   /// \brief handles to the joints from within Gazebo
-  GZ_SIM_NAMESPACE Entity sim_joint;
+  sim::Entity sim_joint;
 
   /// \brief Control method defined in the URDF for each joint.
   gz_ros2_control::GazeboSimSystemInterface::ControlMethod joint_control_method;
@@ -108,7 +108,7 @@ public:
   std::string topicName{};
 
   /// \brief handles to the imu from within Gazebo
-  GZ_SIM_NAMESPACE Entity sim_imu_sensors_ = GZ_SIM_NAMESPACE kNullEntity;
+  sim::Entity sim_imu_sensors_ = sim::kNullEntity;
 
   /// \brief An array per IMU with 4 orientation, 3 angular velocity and 3 linear acceleration
   std::array<double, 10> imu_sensor_data_;
@@ -157,7 +157,7 @@ public:
 
   /// \brief Entity component manager, ECM shouldn't be accessed outside those
   /// methods, otherwise the app will crash
-  GZ_SIM_NAMESPACE EntityComponentManager * ecm;
+  sim::EntityComponentManager * ecm;
 
   /// \brief controller update rate
   int * update_rate;
@@ -177,9 +177,9 @@ namespace gz_ros2_control
 
 bool GazeboSimSystem::initSim(
   rclcpp::Node::SharedPtr & model_nh,
-  std::map<std::string, GZ_SIM_NAMESPACE Entity> & enableJoints,
+  std::map<std::string, sim::Entity> & enableJoints,
   const hardware_interface::HardwareInfo & hardware_info,
-  GZ_SIM_NAMESPACE EntityComponentManager & _ecm,
+  sim::EntityComponentManager & _ecm,
   int & update_rate)
 {
   this->dataPtr = std::make_unique<GazeboSimSystemPrivate>();
@@ -215,31 +215,31 @@ bool GazeboSimSystem::initSim(
     auto & joint_info = hardware_info.joints[j];
     std::string joint_name = this->dataPtr->joints_[j].name = joint_info.name;
 
-    GZ_SIM_NAMESPACE Entity simjoint = enableJoints[joint_name];
+    sim::Entity simjoint = enableJoints[joint_name];
     this->dataPtr->joints_[j].sim_joint = simjoint;
 
     // Create joint position component if one doesn't exist
     if (!_ecm.EntityHasComponentType(
         simjoint,
-        GZ_SIM_NAMESPACE components::JointPosition().TypeId()))
+        sim::components::JointPosition().TypeId()))
     {
-      _ecm.CreateComponent(simjoint, GZ_SIM_NAMESPACE components::JointPosition());
+      _ecm.CreateComponent(simjoint, sim::components::JointPosition());
     }
 
     // Create joint velocity component if one doesn't exist
     if (!_ecm.EntityHasComponentType(
         simjoint,
-        GZ_SIM_NAMESPACE components::JointVelocity().TypeId()))
+        sim::components::JointVelocity().TypeId()))
     {
-      _ecm.CreateComponent(simjoint, GZ_SIM_NAMESPACE components::JointVelocity());
+      _ecm.CreateComponent(simjoint, sim::components::JointVelocity());
     }
 
     // Create joint force component if one doesn't exist
     if (!_ecm.EntityHasComponentType(
         simjoint,
-        GZ_SIM_NAMESPACE components::JointForce().TypeId()))
+        sim::components::JointForce().TypeId()))
     {
-      _ecm.CreateComponent(simjoint, GZ_SIM_NAMESPACE components::JointForce());
+      _ecm.CreateComponent(simjoint, sim::components::JointForce());
     }
 
     // Accept this joint and continue configuration
@@ -408,17 +408,17 @@ void GazeboSimSystem::registerSensors(
   // So we have resize only once the structures where the data will be stored, and we can safely
   // use pointers to the structures
 
-  this->dataPtr->ecm->Each<GZ_SIM_NAMESPACE components::Imu,
-    GZ_SIM_NAMESPACE components::Name>(
-    [&](const GZ_SIM_NAMESPACE Entity & _entity,
-    const GZ_SIM_NAMESPACE components::Imu *,
-    const GZ_SIM_NAMESPACE components::Name * _name) -> bool
+  this->dataPtr->ecm->Each<sim::components::Imu,
+    sim::components::Name>(
+    [&](const sim::Entity & _entity,
+    const sim::components::Imu *,
+    const sim::components::Name * _name) -> bool
     {
       auto imuData = std::make_shared<ImuData>();
       RCLCPP_INFO_STREAM(this->nh_->get_logger(), "Loading sensor: " << _name->Data());
 
       auto sensorTopicComp = this->dataPtr->ecm->Component<
-        GZ_SIM_NAMESPACE components::SensorTopic>(_entity);
+        sim::components::SensorTopic>(_entity);
       if (sensorTopicComp) {
         RCLCPP_INFO_STREAM(this->nh_->get_logger(), "Topic name: " << sensorTopicComp->Data());
       }
@@ -512,18 +512,18 @@ hardware_interface::return_type GazeboSimSystem::read(
   for (unsigned int i = 0; i < this->dataPtr->joints_.size(); ++i) {
     // Get the joint velocity
     const auto * jointVelocity =
-      this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointVelocity>(
+      this->dataPtr->ecm->Component<sim::components::JointVelocity>(
       this->dataPtr->joints_[i].sim_joint);
 
     // TODO(ahcorde): Revisit this part gazebosim/ign-physics#124
     // Get the joint force
     // const auto * jointForce =
-    //   _ecm.Component<GZ_SIM_NAMESPACE components::JointForce>(
+    //   _ecm.Component<sim::components::JointForce>(
     //   this->dataPtr->sim_joints_[j]);
 
     // Get the joint position
     const auto * jointPositions =
-      this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointPosition>(
+      this->dataPtr->ecm->Component<sim::components::JointPosition>(
       this->dataPtr->joints_[i].sim_joint);
 
     this->dataPtr->joints_[i].joint_position = jointPositions->Data()[0];
@@ -534,7 +534,7 @@ hardware_interface::return_type GazeboSimSystem::read(
   for (unsigned int i = 0; i < this->dataPtr->imus_.size(); ++i) {
     if (this->dataPtr->imus_[i]->topicName.empty()) {
       auto sensorTopicComp = this->dataPtr->ecm->Component<
-        GZ_SIM_NAMESPACE components::SensorTopic>(this->dataPtr->imus_[i]->sim_imu_sensors_);
+        sim::components::SensorTopic>(this->dataPtr->imus_[i]->sim_imu_sensors_);
       if (sensorTopicComp) {
         this->dataPtr->imus_[i]->topicName = sensorTopicComp->Data();
         RCLCPP_INFO_STREAM(
@@ -603,17 +603,17 @@ hardware_interface::return_type GazeboSimSystem::write(
 {
   for (unsigned int i = 0; i < this->dataPtr->joints_.size(); ++i) {
     if (this->dataPtr->joints_[i].joint_control_method & VELOCITY) {
-      if (!this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointVelocityCmd>(
+      if (!this->dataPtr->ecm->Component<sim::components::JointVelocityCmd>(
           this->dataPtr->joints_[i].sim_joint))
       {
         this->dataPtr->ecm->CreateComponent(
           this->dataPtr->joints_[i].sim_joint,
-          GZ_SIM_NAMESPACE components::JointVelocityCmd({0}));
+          sim::components::JointVelocityCmd({0}));
       } else {
         const auto jointVelCmd =
-          this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointVelocityCmd>(
+          this->dataPtr->ecm->Component<sim::components::JointVelocityCmd>(
           this->dataPtr->joints_[i].sim_joint);
-        *jointVelCmd = GZ_SIM_NAMESPACE components::JointVelocityCmd(
+        *jointVelCmd = sim::components::JointVelocityCmd(
           {this->dataPtr->joints_[i].joint_velocity_cmd});
       }
     } else if (this->dataPtr->joints_[i].joint_control_method & POSITION) {
@@ -626,41 +626,41 @@ hardware_interface::return_type GazeboSimSystem::write(
       double target_vel = -this->dataPtr->position_proportional_gain_ * error;
 
       auto vel =
-        this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointVelocityCmd>(
+        this->dataPtr->ecm->Component<sim::components::JointVelocityCmd>(
         this->dataPtr->joints_[i].sim_joint);
 
       if (vel == nullptr) {
         this->dataPtr->ecm->CreateComponent(
           this->dataPtr->joints_[i].sim_joint,
-          GZ_SIM_NAMESPACE components::JointVelocityCmd({target_vel}));
+          sim::components::JointVelocityCmd({target_vel}));
       } else if (!vel->Data().empty()) {
         vel->Data()[0] = target_vel;
       }
     } else if (this->dataPtr->joints_[i].joint_control_method & EFFORT) {
-      if (!this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointForceCmd>(
+      if (!this->dataPtr->ecm->Component<sim::components::JointForceCmd>(
           this->dataPtr->joints_[i].sim_joint))
       {
         this->dataPtr->ecm->CreateComponent(
           this->dataPtr->joints_[i].sim_joint,
-          GZ_SIM_NAMESPACE components::JointForceCmd({0}));
+          sim::components::JointForceCmd({0}));
       } else {
         const auto jointEffortCmd =
-          this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointForceCmd>(
+          this->dataPtr->ecm->Component<sim::components::JointForceCmd>(
           this->dataPtr->joints_[i].sim_joint);
-        *jointEffortCmd = GZ_SIM_NAMESPACE components::JointForceCmd(
+        *jointEffortCmd = sim::components::JointForceCmd(
           {this->dataPtr->joints_[i].joint_effort_cmd});
       }
     } else {
       // Fallback case is a velocity command of zero
       double target_vel = 0.0;
       auto vel =
-        this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointVelocityCmd>(
+        this->dataPtr->ecm->Component<sim::components::JointVelocityCmd>(
         this->dataPtr->joints_[i].sim_joint);
 
       if (vel == nullptr) {
         this->dataPtr->ecm->CreateComponent(
           this->dataPtr->joints_[i].sim_joint,
-          GZ_SIM_NAMESPACE components::JointVelocityCmd({target_vel}));
+          sim::components::JointVelocityCmd({target_vel}));
       } else if (!vel->Data().empty()) {
         vel->Data()[0] = target_vel;
       } else if (!vel->Data().empty()) {
@@ -675,11 +675,11 @@ hardware_interface::return_type GazeboSimSystem::write(
       if (mimic_interface == "position") {
         // Get the joint position
         double position_mimicked_joint =
-          this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointPosition>(
+          this->dataPtr->ecm->Component<sim::components::JointPosition>(
           this->dataPtr->joints_[mimic_joint.mimicked_joint_index].sim_joint)->Data()[0];
 
         double position_mimic_joint =
-          this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointPosition>(
+          this->dataPtr->ecm->Component<sim::components::JointPosition>(
           this->dataPtr->joints_[mimic_joint.joint_index].sim_joint)->Data()[0];
 
         double position_error =
@@ -688,13 +688,13 @@ hardware_interface::return_type GazeboSimSystem::write(
         double velocity_sp = (-1.0) * position_error * (*this->dataPtr->update_rate);
 
         auto vel =
-          this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointVelocityCmd>(
+          this->dataPtr->ecm->Component<sim::components::JointVelocityCmd>(
           this->dataPtr->joints_[mimic_joint.joint_index].sim_joint);
 
         if (vel == nullptr) {
           this->dataPtr->ecm->CreateComponent(
             this->dataPtr->joints_[mimic_joint.joint_index].sim_joint,
-            GZ_SIM_NAMESPACE components::JointVelocityCmd({velocity_sp}));
+            sim::components::JointVelocityCmd({velocity_sp}));
         } else if (!vel->Data().empty()) {
           vel->Data()[0] = velocity_sp;
         }
@@ -702,20 +702,20 @@ hardware_interface::return_type GazeboSimSystem::write(
       if (mimic_interface == "velocity") {
         // get the velocity of mimicked joint
         double velocity_mimicked_joint =
-          this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointVelocity>(
+          this->dataPtr->ecm->Component<sim::components::JointVelocity>(
           this->dataPtr->joints_[mimic_joint.mimicked_joint_index].sim_joint)->Data()[0];
 
-        if (!this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointVelocityCmd>(
+        if (!this->dataPtr->ecm->Component<sim::components::JointVelocityCmd>(
             this->dataPtr->joints_[mimic_joint.joint_index].sim_joint))
         {
           this->dataPtr->ecm->CreateComponent(
             this->dataPtr->joints_[mimic_joint.joint_index].sim_joint,
-            GZ_SIM_NAMESPACE components::JointVelocityCmd({0}));
+            sim::components::JointVelocityCmd({0}));
         } else {
           const auto jointVelCmd =
-            this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointVelocityCmd>(
+            this->dataPtr->ecm->Component<sim::components::JointVelocityCmd>(
             this->dataPtr->joints_[mimic_joint.joint_index].sim_joint);
-          *jointVelCmd = GZ_SIM_NAMESPACE components::JointVelocityCmd(
+          *jointVelCmd = sim::components::JointVelocityCmd(
             {mimic_joint.multiplier * velocity_mimicked_joint});
         }
       }
@@ -723,19 +723,19 @@ hardware_interface::return_type GazeboSimSystem::write(
         // TODO(ahcorde): Revisit this part ignitionrobotics/ign-physics#124
         // Get the joint force
         // const auto * jointForce =
-        //   _ecm.Component<GZ_SIM_NAMESPACE components::JointForce>(
+        //   _ecm.Component<sim::components::JointForce>(
         //   this->dataPtr->sim_joints_[j]);
-        if (!this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointForceCmd>(
+        if (!this->dataPtr->ecm->Component<sim::components::JointForceCmd>(
             this->dataPtr->joints_[mimic_joint.joint_index].sim_joint))
         {
           this->dataPtr->ecm->CreateComponent(
             this->dataPtr->joints_[mimic_joint.joint_index].sim_joint,
-            GZ_SIM_NAMESPACE components::JointForceCmd({0}));
+            sim::components::JointForceCmd({0}));
         } else {
           const auto jointEffortCmd =
-            this->dataPtr->ecm->Component<GZ_SIM_NAMESPACE components::JointForceCmd>(
+            this->dataPtr->ecm->Component<sim::components::JointForceCmd>(
             this->dataPtr->joints_[mimic_joint.joint_index].sim_joint);
-          *jointEffortCmd = GZ_SIM_NAMESPACE components::JointForceCmd(
+          *jointEffortCmd = sim::components::JointForceCmd(
             {mimic_joint.multiplier *
               this->dataPtr->joints_[mimic_joint.mimicked_joint_index].joint_effort});
         }

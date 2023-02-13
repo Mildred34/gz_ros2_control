@@ -51,7 +51,8 @@ jobs:
           python3-colcon-ros \
           python3-colcon-common-extensions \
           python3-rosdep \
-          build-essential
+          build-essential \
+          $GZ_DEPS
         cd /home/ros2_ws/src/
         rosdep init
         rosdep update
