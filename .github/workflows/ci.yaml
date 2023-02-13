@@ -19,6 +19,9 @@ jobs:
             ros-distro: "rolling"
           - docker-image: "ubuntu:22.04"
             gz-version: "garden"
+            ros-distro: "humble"
+          - docker-image: "ubuntu:22.04"
+            gz-version: "garden"
             ros-distro: "rolling"
     env:
       DOCKER_IMAGE: ${{ matrix.docker-image }}
@@ -36,6 +39,12 @@ jobs:
         apt install -qq -y lsb-release wget curl gnupg2
         cd ..
         mkdir -p /home/ros2_ws/src
+        if [ "$ROS_DISTRO" == "rolling" ]; then
+          git clone https://github.com/gazebosim/ros_gz/
+        fi
+        if [ "$ROS_DISTRO" == "humble" ]; then
+          git clone https://github.com/gazebosim/ros_gz/ -b humble
+        fi
         cp -r gz_ros2_control /home/ros2_ws/src/
         sh -c 'echo "deb http://packages.ros.org/ros2-testing/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros2-testing.list'
         curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -
