@@ -24,8 +24,8 @@ find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(yaml_cpp_vendor REQUIRED)
 
-SET(GZ_PLUGIN)
-SET(GZ_SIM)
+set(GZ_PLUGIN)
+set(GZ_SIM)
 
 if("$ENV{GZ_VERSION}" STREQUAL "fortress")
   find_package(ignition-gazebo6 REQUIRED)

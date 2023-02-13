@@ -22,6 +22,8 @@
 #include <vector>
 
 #ifdef GZ_HEADERS
+#include <gz/msgs/imu.pb.h>
+
 #include <gz/sim/components/AngularVelocity.hh>
 #include <gz/sim/components/Imu.hh>
 #include <gz/sim/components/JointForce.hh>
@@ -35,11 +37,12 @@
 #include <gz/sim/components/ParentEntity.hh>
 #include <gz/sim/components/Pose.hh>
 #include <gz/sim/components/Sensor.hh>
-#include <gz/msgs/imu.pb.h>
 #include <gz/transport/Node.hh>
 #define GZ_TRANSPORT_NAMESPACE gz::transport::
 #define GZ_MSGS_NAMESPACE gz::msgs::
 #else
+#include <ignition/msgs/imu.pb.h>
+
 #include <ignition/gazebo/components/AngularVelocity.hh>
 #include <ignition/gazebo/components/Imu.hh>
 #include <ignition/gazebo/components/JointForce.hh>
@@ -52,7 +55,6 @@
 #include <ignition/gazebo/components/ParentEntity.hh>
 #include <ignition/gazebo/components/Pose.hh>
 #include <ignition/gazebo/components/Sensor.hh>
-#include <ignition/msgs/imu.pb.h>
 #include <ignition/transport/Node.hh>
 #define GZ_TRANSPORT_NAMESPACE ignition::transport::
 #define GZ_MSGS_NAMESPACE ignition::msgs::
