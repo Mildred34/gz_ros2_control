@@ -64,7 +64,7 @@ jobs:
           $GZ_DEPS
 
         if [ "$GZ_VERSION" == "garden" ]; then
-          ROSDEP_ARGS="--skip-keys=ros_gz_sim gz-plugin2 gz-sim7"
+          ROSDEP_ARGS="--skip-keys ros_gz_sim --skip-keys gz-plugin2 --skip-keys gz-sim7"
         fi
         cd /home/ros2_ws/src/
         rosdep init
