@@ -36,10 +36,9 @@
   <exec_depend>ros2launch</exec_depend>
   <exec_depend>rclcpp</exec_depend>
   <exec_depend>robot_state_publisher</exec_depend>
-  <depend condition="$GZ_VERSION == ''">ros_gz_sim</depend>
-  <depend condition="$GZ_VERSION == 'garden'">ros_gz_sim</depend>
-  <depend condition="$GZ_VERSION == fortress">ros_ign_sim</depend>
-  <exec_depend>ros_gz_sim</exec_depend>
+  <exec_depend condition="$GZ_VERSION == ''">ros_gz_sim</exec_depend>
+  <exec_depend condition="$GZ_VERSION == 'garden'">ros_gz_sim</exec_depend>
+  <exec_depend condition="$GZ_VERSION == fortress">ros_ign_sim</exec_depend>
   <exec_depend>ros2controlcli</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>velocity_controllers</exec_depend>
