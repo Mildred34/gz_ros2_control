@@ -62,10 +62,14 @@ jobs:
           python3-rosdep \
           build-essential \
           $GZ_DEPS
+
+        if [ "$GZ_VERSION" == "garden" ]; then
+          ROSDEP_ARGS="--skip-keys=ros_gz_sim gz-plugin2 gz-sim7"
+        fi
         cd /home/ros2_ws/src/
         rosdep init
         rosdep update
-        rosdep install --from-paths ./ -i -y --rosdistro ${ROS_DISTRO} --ignore-src
+        rosdep install --from-paths ./ -i -y --rosdistro ${ROS_DISTRO} --ignore-src $ROSDEP_ARGS
     - name: Build project
       id: build
       run: |
