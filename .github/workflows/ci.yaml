@@ -37,7 +37,7 @@ jobs:
       run: |
         export DEBIAN_FRONTEND=noninteractive
         apt update -qq
-        apt install -qq -y lsb-release wget curl gnupg2
+        apt install -qq -y lsb-release wget curl gnupg2 git
         cd ..
         mkdir -p /home/ros2_ws/src
         if [ "$ROS_DISTRO" == "rolling" ]; then
