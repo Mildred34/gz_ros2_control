@@ -403,7 +403,7 @@ void GazeboSimROS2ControlPlugin::Configure(
   }
 
   for (unsigned int i = 0; i < control_hardware_info.size(); ++i) {
-#ifdef GZ_HEADERS
+#ifndef ROLLING
     std::string robot_hw_sim_type_str_ = control_hardware_info[i].hardware_class_type;
 #else
     std::string robot_hw_sim_type_str_ = control_hardware_info[i].hardware_plugin_name;
