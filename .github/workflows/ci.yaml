@@ -51,7 +51,7 @@ jobs:
         wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
         if [ "$GZ_VERSION" == "garden" ]; then
-          GZ_DEPS="libgz-sim7-dev libgz-plugin2-dev"
+          export GZ_DEPS="libgz-sim7-dev libgz-plugin2-dev"
         fi
 
         apt-get update && apt-get upgrade -q -y
@@ -64,7 +64,7 @@ jobs:
           $GZ_DEPS
 
         if [ "$GZ_VERSION" == "garden" ]; then
-          ROSDEP_ARGS="--skip-keys ros_gz_sim --skip-keys gz-plugin2 --skip-keys gz-sim7 --skip-keys gz-transport12 --skip-keys gz-math7 --skip-keys gz-msgs9"
+          export ROSDEP_ARGS="--skip-keys ros_gz_sim --skip-keys gz-plugin2 --skip-keys gz-sim7 --skip-keys gz-transport12 --skip-keys gz-math7 --skip-keys gz-msgs9"
         fi
         cd /home/ros2_ws/src/
         rosdep init
