@@ -7,6 +7,18 @@
       GazeboPositionJoint
     </description>
   </class>
+
+  <!--
+  <class
+    name="gz_ros2_control/UnderactuatedGazeboSimSystem"
+    type="gz_ros2_control::UnderactuatedGazeboSimSystem"
+    base_class_type="gz_ros2_control::GazeboSimSystemInterface">
+    <description>
+      Custom class for underactuated gripper simulation.
+    </description>
+  </class>
+  -->
+
   <class
      name="ign_ros2_control/IgnitionSystem"
      type="gz_ros2_control::GazeboSimSystem"
