@@ -20,6 +20,7 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(controller_manager REQUIRED)
 find_package(hardware_interface REQUIRED)
+# find_package(transmision_interface REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(yaml_cpp_vendor REQUIRED)
@@ -64,6 +65,7 @@ ament_target_dependencies(${PROJECT_NAME}-system
   ament_index_cpp
   controller_manager
   hardware_interface
+  # transmission_interface
   pluginlib
   rclcpp
   yaml_cpp_vendor
